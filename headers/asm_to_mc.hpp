@@ -24,6 +24,10 @@ enum ReadingMode{
     DATA,TEXT
 };
 
+enum currentDataOffestMode{
+    OFF,BYTE,HALF,WORD,DWORD,ASCIZ
+};
+
 struct MCinstruction{
     u_int32_t opcode;
     u_int32_t func3;

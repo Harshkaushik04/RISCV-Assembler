@@ -2,7 +2,7 @@
 using namespace std;
 
 int main(){
-    string filepath="../testInputs/test2.asm";
+    string filepath="../testInputs/test3.asm";
     Assembler assembler=Assembler(filepath);
     assembler.makeInputInstructions();
     cout<<"input instructions:"<<endl;
@@ -14,12 +14,14 @@ int main(){
         for(string word:list){
             cout<<word<<endl;
         }
+        cout<<"====================="<<endl;
     }
     cout<<"divided text instructions:"<<endl;
     for(vector<string> list:assembler.dividedTextInstructions){
         for(string word:list){
             cout<<word<<endl;
         }
+        cout<<"===================="<<endl;
     }
     cout<<"symbol table:"<<endl;
     for(pair<string,u_int32_t> new_pair:assembler.symbolTable){

@@ -30,32 +30,28 @@ void Assembler::makeInputInstructions(){
     int currentDataOffset=0;
     currentDataOffestMode dataOffestMode=currentDataOffestMode::OFF;
     if(!inputFile.is_open()){
-        cerr<<"error at line 31:asm_to_mc.cpp, Couldnt find input file path"<<inputFilePath<<endl;
+        cerr<<"error at line 33:asm_to_mc.cpp, Couldnt find input file path"<<inputFilePath<<endl;
     }
     while(getline(inputFile,line)){
         inputInstructions.emplace_back(line);
     }
     for(string line:inputInstructions){
-        if(line==".text"){
+        if(line.size()>=5){
+            if(line.substr(0,5)==".text"){
             currentMode=ReadingMode::TEXT;
             continue;
         }
-        else if(line==".data"){
+        else if(line.substr(0,5)==".data"){
             currentMode=ReadingMode::DATA;
             continue;
         }
-        if(line.back()==':'){
-            string label=line.substr(0,line.size()-1);
-            if(currentMode==ReadingMode::TEXT){
-                u_int32_t address=dividedTextInstructions.size()*4;
-                symbolTable[label]=address;
-            }
         }
         vector<string> tokens;
         string current;
         for (char ch : line) {
             if (ch==' '||ch==','||ch =='('||ch == ')') {
                 if (!current.empty()) {
+                    // cout<<"current and current.back():"<<current<<"  "<<current.back()<<endl;
                     if(current.back()==':'){
                         if(currentMode==ReadingMode::TEXT){
                             string label=current.substr(0,current.size()-1);
@@ -68,33 +64,55 @@ void Assembler::makeInputInstructions(){
                             string label=current.substr(0,current.size()-1);
                             u_int32_t address=0x10000000+currentDataOffset;
                             symbolTable[label]=address;
-                            //current data offset is yet to be changed
+                            tokens.emplace_back(label);
                             current.clear();
                             continue;
                         }
                     }
                     //5 cases of .data
                     if(current==".byte"){
-                        currentDataOffset+=1;
+                        dataOffestMode=currentDataOffestMode::BYTE;
+                        current.clear();
+                        continue;
                     }
                     else if(current==".half"){
-                        currentDataOffset+=2;
+                        dataOffestMode=currentDataOffestMode::HALF;
+                        current.clear();
+                        continue;
                     }
                     else if(current==".word"){
-                        currentDataOffset+=8;
+                        dataOffestMode=currentDataOffestMode::WORD;
+                        current.clear();
+                        continue;
                     }
                     else if(current==".dword"){
-                        currentDataOffset+=16;
+                        dataOffestMode=currentDataOffestMode::DWORD;
+                        current.clear();
+                        continue;
                     }
                     else if(current==".asciz"){
                         dataOffestMode=currentDataOffestMode::ASCIZ;
+                        current.clear();
+                        continue;
                     }
                     //changing currentDataOffset for asciz
                     if(dataOffestMode==currentDataOffestMode::ASCIZ && current!=".asciz"){
                         currentDataOffset+=current.size()+1; //n+1
                         dataOffestMode=currentDataOffestMode::OFF;
                     }
-                    tokens.push_back(current);
+                    else if(dataOffestMode==currentDataOffestMode::BYTE && current!=".byte"){
+                        currentDataOffset+=1;
+                    }
+                    else if(dataOffestMode==currentDataOffestMode::HALF && current!=".byte"){
+                        currentDataOffset+=2;
+                    }
+                    else if(dataOffestMode==currentDataOffestMode::WORD && current!=".byte"){
+                        currentDataOffset+=4;
+                    }
+                    else if(dataOffestMode==currentDataOffestMode::DWORD && current!=".byte"){
+                        currentDataOffset+=8;
+                    }
+                    tokens.emplace_back(current);
                     current.clear();
                 }
             }
@@ -105,12 +123,40 @@ void Assembler::makeInputInstructions(){
                 current += ch;
             }
         }
-        if (!current.empty()) tokens.push_back(current);
-        if(currentMode==ReadingMode::DATA){
-            dividedDataInstructions.emplace_back(tokens);
+        dataOffestMode=currentDataOffestMode::OFF;
+        if(current.back()==':'){
+            // cout<<"h1"<<"current and current.back():"<<current<<"  "<<current.back()<<endl;
+            string label=line.substr(0,current.size()-1);
+            if(currentMode==ReadingMode::TEXT){
+                string label=current.substr(0,current.size()-1);
+                u_int32_t address=dividedTextInstructions.size()*4;
+                symbolTable[label]=address;
+                current.clear();
+                // cout<<"hello"<<endl;
+                // cout<<"divided text instructions:"<<endl;
+                for(vector<string> list:dividedTextInstructions){
+                    for(string word:list){
+                        cout<<word<<endl;
+                    }
+                }
+                continue;
+            }
+            else{ //ReadingMode::DATA
+                string label=current.substr(0,current.size()-1);
+                u_int32_t address=0x10000000+currentDataOffset;
+                symbolTable[label]=address;
+                tokens.emplace_back(label);
+                current.clear();
+            }
         }
-        else{
-            dividedTextInstructions.emplace_back(tokens);
+        if (!current.empty()) tokens.push_back(current);
+        if(tokens.size()>0){
+            if(currentMode==ReadingMode::DATA){
+                dividedDataInstructions.emplace_back(tokens);
+            }
+            else{
+                dividedTextInstructions.emplace_back(tokens);
+            }
         }
     }
 }
