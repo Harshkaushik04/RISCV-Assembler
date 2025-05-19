@@ -2,18 +2,30 @@
 using namespace std;
 
 int main(){
-    string filepath="../testInputs/test1.asm";
+    string filepath="../testInputs/test2.asm";
     Assembler assembler=Assembler(filepath);
     assembler.makeInputInstructions();
     cout<<"input instructions:"<<endl;
     for(string instruction:assembler.inputInstructions){
         cout<<instruction<<endl;
     }
-    cout<<"divided input instrcutions:"<<endl;
-    for(pair<vector<string>,ReadingMode> pair1:assembler.dividedInputInstructions){
-        for(string word:pair1.first){
+    cout<<"divided data instructions:"<<endl;
+    for(vector<string> list:assembler.dividedDataInstructions){
+        for(string word:list){
             cout<<word<<endl;
         }
     }
+    cout<<"divided text instructions:"<<endl;
+    for(vector<string> list:assembler.dividedTextInstructions){
+        for(string word:list){
+            cout<<word<<endl;
+        }
+    }
+    cout<<"symbol table:"<<endl;
+    for(pair<string,u_int32_t> new_pair:assembler.symbolTable){
+        cout<<new_pair.first<<":"<<"0x"<<std::hex<<new_pair.second<<endl;
+    }
+    cout<<assembler.dividedDataInstructions.size()<<endl;
+    cout<<assembler.dividedTextInstructions.size()<<endl;
     return 0;
 }
