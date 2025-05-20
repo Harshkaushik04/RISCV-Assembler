@@ -40,6 +40,12 @@ Assembler::Assembler(){
     for(int i=3;i<7;i++){
         register_to_int_mapping["t"+to_string(i)]=i+25;
     }
+    register_to_int_mapping["zero"]=0;
+    register_to_int_mapping["ra"]=1;
+    register_to_int_mapping["sp"]=2;
+    register_to_int_mapping["gp"]=3;
+    register_to_int_mapping["tp"]=4;
+    register_to_int_mapping["fp"]=8;
 }
 
 Assembler::Assembler(string inputFilePath){
@@ -70,6 +76,12 @@ Assembler::Assembler(string inputFilePath){
     for(int i=3;i<7;i++){
         register_to_int_mapping["t"+to_string(i)]=i+25;
     }
+    register_to_int_mapping["zero"]=0;
+    register_to_int_mapping["ra"]=1;
+    register_to_int_mapping["sp"]=2;
+    register_to_int_mapping["gp"]=3;
+    register_to_int_mapping["tp"]=4;
+    register_to_int_mapping["fp"]=8;
 }
 
 void Assembler::read_instructions(){
@@ -683,22 +695,22 @@ void Assembler::convertJformatInstructions(int index){
         string second,third;
         second=dividedTextInstructions[index][1];
         third=dividedTextInstructions[index][2];
+        string label;
         u_int32_t rd,result=0,opcode,imm;
         string opcodeString,rdString,immString;
         u_int32_t temp;
         string Total,address,MCinstruction,ASMinstruction,comment;
         opcode=0b1101111;
         rd=register_to_int_mapping[second];
-        if(third.substr(0,2)=="0x"){
-            imm=stoul(third,nullptr,16);
+        label=third;
+        auto it = symbolTable.find(label);
+        if (it != symbolTable.end()) {
+            u_int32_t currentAddress=4*index;
+            imm=it->second-currentAddress;
+        } else {
+            cerr<<"Label:"<<label<<" not found in symbol table"<<endl;
         }
-        else if(third.substr(0,2)=="0b"){
-            imm=stoul(third,nullptr,2);
-        }
-        else{
-            imm=stoul(third);
-        }
-        u_int32_t offset=imm>>2;
+        u_int32_t offset=imm>>1;
         u_int32_t offset_18_11=(offset>>11)&0b11111111;
         u_int32_t offset_10=(offset>>10)&0b1;
         u_int32_t offset_9_0=(offset>>0)&0b1111111111;

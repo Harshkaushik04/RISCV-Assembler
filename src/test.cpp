@@ -2,7 +2,7 @@
 using namespace std;
 
 int main(){
-    string filepath="../testInputs/testTillBformat.asm";
+    string filepath="../testInputs/fibo.asm";
     Assembler assembler=Assembler(filepath);
     assembler.read_instructions();
     cout<<"input instructions:"<<endl;
