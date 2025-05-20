@@ -2,9 +2,9 @@
 using namespace std;
 
 int main(){
-    string filepath="../testInputs/test3.asm";
+    string filepath="../testInputs/testRformat.asm";
     Assembler assembler=Assembler(filepath);
-    assembler.makeInputInstructions();
+    assembler.read_instructions();
     cout<<"input instructions:"<<endl;
     for(string instruction:assembler.inputInstructions){
         cout<<instruction<<endl;
@@ -29,5 +29,10 @@ int main(){
     }
     cout<<assembler.dividedDataInstructions.size()<<endl;
     cout<<assembler.dividedTextInstructions.size()<<endl;
+    assembler.convertALL();
+    cout<<"output text instructions:"<<endl;
+    for(string line:assembler.outputTextInstructions){
+        cout<<line<<endl;
+    }
     return 0;
 }
