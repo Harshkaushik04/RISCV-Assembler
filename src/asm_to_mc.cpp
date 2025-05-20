@@ -319,7 +319,7 @@ void Assembler::convertRformatInstructions(int index){
         func3=0b110;
         func7=0b0000001;
     }
-    result=opcode+rd<<7+func3<<12+rs1<<15+rs2<<20+func7<<25;
+    result=opcode|(rd<<7)|(func3<<12)|(rs1<<15)|(rs2<<20)|(func7<<25);
     MCinstruction="0x"+int_to_hex_string(result);
     ASMinstruction=first+" "+second+","+third+","+fourth;
     temp=4*index;
