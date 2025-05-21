@@ -840,10 +840,10 @@ void Assembler::handleHalfDirective(int index){
         wordString=dividedDataInstructions[index][i];
         word=stoi(wordString);
         address=int_to_hex_string(updatedAddress);
-        for(int i=0;i<2;i++){
-            parts[i]=(word>>(i-1)*8)&0xFF;
-            partStrings[i]=int_to_hex_string(parts[i]);
-            output="0x"+address+" "+partStrings[i];
+        for(int j=0;j<2;j++){
+            parts[j]=(word>>j*8)&0xFF;
+            partStrings[j]=int_to_hex_string(parts[j]);
+            output="0x"+address+" "+partStrings[j];
             outputDataInstructions.emplace_back(output);
             updatedAddress+=4;
             address=int_to_hex_string(updatedAddress);
@@ -864,10 +864,10 @@ void Assembler::handleWordDirective(int index){
         wordString=dividedDataInstructions[index][i];
         word=stoi(wordString);
         address=int_to_hex_string(updatedAddress);
-        for(int i=0;i<4;i++){
-            parts[i]=(word>>(i-1)*8)&0xFF;
-            partStrings[i]=int_to_hex_string(parts[i]);
-            output="0x"+address+" "+partStrings[i];
+        for(int j=0;j<4;j++){
+            parts[j]=(word>>j*8)&0xFF;
+            partStrings[j]=int_to_hex_string(parts[j]);
+            output="0x"+address+" "+partStrings[j];
             outputDataInstructions.emplace_back(output);
             updatedAddress+=4;
             address=int_to_hex_string(updatedAddress);
@@ -888,10 +888,10 @@ void Assembler::handleDwordDirective(int index){
         wordString=dividedDataInstructions[index][i];
         word=stoi(wordString);
         address=int_to_hex_string(updatedAddress);
-        for(int i=0;i<8;i++){
-            parts[i]=(word>>(i-1)*8)&0xFF;
-            partStrings[i]=int_to_hex_string(parts[i]);
-            output="0x"+address+" "+partStrings[i];
+        for(int j=0;j<8;j++){
+            parts[j]=(word>>j*8)&0xFF;
+            partStrings[j]=int_to_hex_string(parts[j]);
+            output="0x"+address+" "+partStrings[j];
             outputDataInstructions.emplace_back(output);
             updatedAddress+=4;
             address=int_to_hex_string(updatedAddress);
@@ -939,3 +939,4 @@ void Assembler::assemble(string outputFilePath){
     convertALL();
     makeOutputFile(outputFilePath);
 }
+//correct .data as both address and data is in hex so less zeros will be there

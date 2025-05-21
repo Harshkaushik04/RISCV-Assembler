@@ -29,7 +29,7 @@ int main(){
     }
     cout<<assembler.dividedDataInstructions.size()<<endl;
     cout<<assembler.dividedTextInstructions.size()<<endl;
-    assembler.assemble("testOutputs/test3.mc");
+    assembler.assemble("../testOutputs/test3.mc");
     cout<<"output text instructions:"<<endl;
     for(string line:assembler.outputTextInstructions){
         cout<<line<<endl;
