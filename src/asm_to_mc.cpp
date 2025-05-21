@@ -8,8 +8,18 @@ string int_to_hex_string(int num){
 }
 
 
-std::string int_to_binary_string(int value,int numBits) {
+string int_to_binary_string(int value,int numBits) {
     return bitset<32>(value).to_string().substr(32 - numBits);  
+}
+
+vector<string> string_to_hex_bytes(string input) {
+    vector<string> hex_bytes;
+    for (unsigned char c : input) {
+        stringstream ss;
+        ss << hex << setw(2) << setfill('0') << static_cast<int>(c);
+        hex_bytes.push_back(ss.str());
+    }
+    return hex_bytes;
 }
 
 Assembler::Assembler(){
@@ -127,7 +137,7 @@ void Assembler::read_instructions(){
                             string label=current.substr(0,current.size()-1);
                             u_int32_t address=0x10000000+currentDataOffset;
                             symbolTable[label]=address;
-                            tokens.emplace_back(label);
+                            tokens.emplace_back(to_string(address));
                             current.clear();
                             continue;
                         }
@@ -135,26 +145,31 @@ void Assembler::read_instructions(){
                     //5 cases of .data
                     if(current==".byte"){
                         dataOffestMode=currentDataOffestMode::BYTE;
+                        tokens.emplace_back(current);
                         current.clear();
                         continue;
                     }
                     else if(current==".half"){
                         dataOffestMode=currentDataOffestMode::HALF;
+                        tokens.emplace_back(current);
                         current.clear();
                         continue;
                     }
                     else if(current==".word"){
                         dataOffestMode=currentDataOffestMode::WORD;
+                        tokens.emplace_back(current);
                         current.clear();
                         continue;
                     }
                     else if(current==".dword"){
                         dataOffestMode=currentDataOffestMode::DWORD;
+                        tokens.emplace_back(current);
                         current.clear();
                         continue;
                     }
                     else if(current==".asciz"){
                         dataOffestMode=currentDataOffestMode::ASCIZ;
+                        tokens.emplace_back(current);
                         current.clear();
                         continue;
                     }
@@ -257,6 +272,27 @@ void Assembler::convertALL(){
         }
         else{
             cerr<<"Instruction not implemented"<<endl;
+        }
+    }
+
+    //data directives
+    for(int index=0;index<dividedDataInstructions.size();index++){
+        string second;
+        second=dividedDataInstructions[index][1];
+        if(second==".byte"){
+            handleByteDirective(index);
+        }
+        else if(second==".half"){
+            handleHalfDirective(index);
+        }
+        else if(second==".word"){
+            handleWordDirective(index);
+        }
+        else if(second==".dword"){
+            handleDwordDirective(index);
+        }
+        else if(second==".asciiz"){
+            handleAsciizDirective(index);
         }
     }
 }
@@ -778,3 +814,128 @@ void Assembler::convertJformatInstructions(int index){
     }
 }
 
+void Assembler::handleByteDirective(int index){
+    int len=dividedDataInstructions[index].size();
+    string address=dividedDataInstructions[index][0];
+    u_int32_t updatedAddress=stoul(address);
+    string output;
+    for(int i=2;i<len;i++){
+        address=int_to_hex_string(updatedAddress);
+        output="0x"+address+" "+dividedDataInstructions[index][i];
+        outputDataInstructions.emplace_back(output);
+        updatedAddress+=4;
+    }
+}
+
+void Assembler::handleHalfDirective(int index){
+    int len=dividedDataInstructions[index].size();
+    string address=dividedDataInstructions[index][0];
+    u_int32_t updatedAddress=stoul(address);
+    string output;
+    string wordString;
+    u_int16_t word;
+    u_int8_t* parts=new u_int8_t[2];
+    string* partStrings=new string[2];
+    for(int i=2;i<len;i++){
+        wordString=dividedDataInstructions[index][i];
+        word=stoi(wordString);
+        address=int_to_hex_string(updatedAddress);
+        for(int i=0;i<2;i++){
+            parts[i]=(word>>(i-1)*8)&0xFF;
+            partStrings[i]=int_to_hex_string(parts[i]);
+            output="0x"+address+" "+partStrings[i];
+            outputDataInstructions.emplace_back(output);
+            updatedAddress+=4;
+            address=int_to_hex_string(updatedAddress);
+        }
+    }
+}
+
+void Assembler::handleWordDirective(int index){
+    int len=dividedDataInstructions[index].size();
+    string address=dividedDataInstructions[index][0];
+    u_int32_t updatedAddress=stoul(address);
+    string output;
+    string wordString;
+    u_int32_t word;
+    u_int8_t* parts=new u_int8_t[4];
+    string* partStrings=new string[4];
+    for(int i=2;i<len;i++){
+        wordString=dividedDataInstructions[index][i];
+        word=stoi(wordString);
+        address=int_to_hex_string(updatedAddress);
+        for(int i=0;i<4;i++){
+            parts[i]=(word>>(i-1)*8)&0xFF;
+            partStrings[i]=int_to_hex_string(parts[i]);
+            output="0x"+address+" "+partStrings[i];
+            outputDataInstructions.emplace_back(output);
+            updatedAddress+=4;
+            address=int_to_hex_string(updatedAddress);
+        }
+    }
+}
+
+void Assembler::handleDwordDirective(int index){
+    int len=dividedDataInstructions[index].size();
+    string address=dividedDataInstructions[index][0];
+    u_int32_t updatedAddress=stoul(address);
+    string output;
+    string wordString;
+    u_int64_t word;
+    u_int8_t* parts=new u_int8_t[8];
+    string* partStrings=new string[8];
+    for(int i=2;i<len;i++){
+        wordString=dividedDataInstructions[index][i];
+        word=stoi(wordString);
+        address=int_to_hex_string(updatedAddress);
+        for(int i=0;i<8;i++){
+            parts[i]=(word>>(i-1)*8)&0xFF;
+            partStrings[i]=int_to_hex_string(parts[i]);
+            output="0x"+address+" "+partStrings[i];
+            outputDataInstructions.emplace_back(output);
+            updatedAddress+=4;
+            address=int_to_hex_string(updatedAddress);
+        }
+    }
+}
+
+void Assembler::handleAsciizDirective(int index){
+    int len=dividedDataInstructions[index].size();
+    string address=dividedDataInstructions[index][0];
+    u_int32_t updatedAddress=stoul(address);
+    string output;
+    string wordString;
+    vector<string> hex_bytes;
+    int len2;
+    for(int i=2;i<len;i++){
+        wordString=dividedDataInstructions[index][i];
+        wordString.erase(remove(wordString.begin(), wordString.end(), '\"'), wordString.end()); //removes ""
+        address=int_to_hex_string(updatedAddress);
+        hex_bytes=string_to_hex_bytes(wordString);
+        len2=hex_bytes.size();
+        for(int j=0;j<len2;j++){
+            output="0x"+address+" "+hex_bytes[j];
+            outputDataInstructions.emplace_back(output);
+            updatedAddress+=4;
+            address=int_to_hex_string(updatedAddress);
+        }
+    }
+}
+
+void Assembler::makeOutputFile(string outputFilePath){
+    ofstream file(outputFilePath);  
+    for (string line : outputTextInstructions) {
+        file << line << '\n';  
+    }
+    file<<"END"<<'\n';
+    for (string line : outputDataInstructions) {
+        file << line << '\n';  
+    }
+    file.close();  
+    cout<<"file made at "<<outputFilePath<<endl;
+}
+
+void Assembler::assemble(string outputFilePath){
+    convertALL();
+    makeOutputFile(outputFilePath);
+}

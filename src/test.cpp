@@ -2,7 +2,7 @@
 using namespace std;
 
 int main(){
-    string filepath="../testInputs/fibo.asm";
+    string filepath="../testInputs/test3.asm";
     Assembler assembler=Assembler(filepath);
     assembler.read_instructions();
     cout<<"input instructions:"<<endl;
@@ -29,7 +29,7 @@ int main(){
     }
     cout<<assembler.dividedDataInstructions.size()<<endl;
     cout<<assembler.dividedTextInstructions.size()<<endl;
-    assembler.convertALL();
+    assembler.assemble("testOutputs/test3.mc");
     cout<<"output text instructions:"<<endl;
     for(string line:assembler.outputTextInstructions){
         cout<<line<<endl;
