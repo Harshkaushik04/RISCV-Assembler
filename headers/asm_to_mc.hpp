@@ -6,6 +6,7 @@
 #include<vector>
 #include<string>
 #include<bitset>
+#include<algorithm>
 
 enum FormatType{
     Rformat,Iformat,Sformat,
@@ -29,18 +30,6 @@ enum currentDataOffestMode{
     OFF,BYTE,HALF,WORD,DWORD,ASCIZ
 };
 
-struct MCinstruction{
-    u_int32_t opcode;
-    u_int32_t func3;
-    u_int32_t func7;
-    u_int32_t rd;
-    u_int32_t rs1;
-    u_int32_t rs2;
-    u_int32_t immediate; 
-};
-
-
-
 class Assembler{
 public:
     std::string inputFilePath;
@@ -60,8 +49,13 @@ public:
     void convertBformatInstructions(int);
     void convertUformatInstructions(int);
     void convertJformatInstructions(int);
-    void makeOutputFile();
-    void assemble(); //do all
+    void handleByteDirective(int);
+    void handleHalfDirective(int);
+    void handleWordDirective(int);
+    void handleDwordDirective(int);
+    void handleAsciizDirective(int);
+    void makeOutputFile(std::string);
+    void assemble(std::string); //do all
     Assembler();
     Assembler(std::string);
 };
