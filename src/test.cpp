@@ -2,13 +2,13 @@
 using namespace std;
 
 int main(){
-    string filepath="../testInputs/test3.asm";
+    string filepath="../testInputs/finalTesting.asm";
     Assembler assembler=Assembler(filepath);
     assembler.read_instructions();
-    cout<<"input instructions:"<<endl;
-    for(string instruction:assembler.inputInstructions){
-        cout<<instruction<<endl;
-    }
+    // cout<<"input instructions:"<<endl;
+    // for(string instruction:assembler.inputInstructions){
+    //     cout<<instruction<<endl;
+    // }
     cout<<"divided data instructions:"<<endl;
     for(vector<string> list:assembler.dividedDataInstructions){
         for(string word:list){
@@ -29,7 +29,7 @@ int main(){
     }
     cout<<assembler.dividedDataInstructions.size()<<endl;
     cout<<assembler.dividedTextInstructions.size()<<endl;
-    assembler.assemble("../testOutputs/test3.mc");
+    assembler.assemble("../testOutputs/final.mc");
     cout<<"output text instructions:"<<endl;
     for(string line:assembler.outputTextInstructions){
         cout<<line<<endl;
