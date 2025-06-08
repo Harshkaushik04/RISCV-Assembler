@@ -18,7 +18,7 @@ enum Instruction{
     ADDI,SLTI,SLTIU,XORI,ORI,ANDI,SLLI,SRLI,SRAI,LD,LB,LH,LW,LBU,LHU,
     SB,SH,SW,SD,
     BEQ,BNE,BGE,BLT,BLTU,BGEU,
-    LUI,AUIPIC,
+    LUI,AUIPC,
     JAL,JALR
 };
 
@@ -53,7 +53,7 @@ public:
     void handleHalfDirective(int);
     void handleWordDirective(int);
     void handleDwordDirective(int);
-    void handleAsciizDirective(int);
+    void handleAscizDirective(int);
     void makeOutputFile(std::string);
     void assemble(std::string); //do all
     Assembler();

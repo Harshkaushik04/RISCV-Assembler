@@ -1,9 +1,8 @@
 .data
-array:       .word 8, 7, 6, 5, 4, 3, 2, 1     # 8 integers, 32 bytes total
+array:       .word 8, 300, 6, 5, 4, 3, 2, 1     # 8 integers, 32 bytes total
 array_len:   .word 8                           # length = 8
 aux_buffer:  .word 0,0,0,0,0,0,0,0             # aux buffer, 8 words (32 bytes)
-newline:     .asciz "\n"
-
+new:         .asciz "Hello"
 .text
 _start:
     # Load array address and length
